@@ -96,6 +96,7 @@ def compare_zips():
     if request.method == "OPTIONS":
         return _build_cors_preflight_response()
     elif request.method == "POST":
+        request.headers.add('Access-Control-Allow-Origin', '*')        
         try:
             if 'zip1' not in request.files or 'zip2' not in request.files:
                 return jsonify({"error": "Missing zip files"}), 400
