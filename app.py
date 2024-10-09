@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 from functools import partial
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000/"}})
+CORS(app, resources={r"/*": {"origins": ["http://localhost:3000/","https://web-production-a90f7.up.railway.app"]}})
 
 MAX_SIZE_MB = 50
 
