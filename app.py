@@ -9,7 +9,7 @@ from functools import partial
 
 app = Flask(__name__)
 
-allowed_origins = ["https://zipcollate.netlify.app/"]
+allowed_origins = ["https://zipcollate.netlify.app"]
 
 CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
