@@ -8,7 +8,10 @@ from werkzeug.utils import secure_filename
 from functools import partial
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+
+allowed_origins = ["https://zipcollate.netlify.app/"]
+
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
 app.config['CORS_HEADERS'] = 'Content-Type'
 
