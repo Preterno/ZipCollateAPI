@@ -95,7 +95,6 @@ def zip_comparison(zip1_path, zip2_path, password1, password2, exclude_list):
 
 @app.route('/compare_zips', methods=['POST'])
 def compare_zips():
-    request.headers.add('Access-Control-Allow-Origin', '*')        
     try:
         if 'zip1' not in request.files or 'zip2' not in request.files:
             return jsonify({"error": "Missing zip files"}), 400
