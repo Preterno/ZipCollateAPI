@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 import os
 import zipfile
 import tempfile
@@ -92,7 +92,6 @@ def zip_comparison(zip1_path, zip2_path, password1, password2, exclude_list):
 
 
 @app.route('/compare_zips', methods=['POST'])
-@cross_origins(allow_all=True)
 def compare_zips():
     request.headers.add('Access-Control-Allow-Origin', '*')        
     try:
