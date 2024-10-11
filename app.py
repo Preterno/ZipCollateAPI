@@ -6,6 +6,9 @@ import tempfile
 from xxhash import xxh64
 from werkzeug.utils import secure_filename
 from functools import partial
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -98,47 +101,51 @@ def zip_comparison(zip1_path, zip2_path, password1, password2, exclude_list):
 
 @app.route('/compare_zips', methods=['POST'])
 def compare_zips():
-    try:
-        if 'zip1' not in request.files or 'zip2' not in request.files:
-            return jsonify({"error": "Missing zip files"}), 400
+    api_key = os.getenv('API_KEY')
+    if request.headers.get('X-API-KEY') == api_key:
+        try:
+            if 'zip1' not in request.files or 'zip2' not in request.files:
+                return jsonify({"error": "Missing zip files"}), 400
 
-        zip1 = request.files['zip1']
-        zip2 = request.files['zip2']
+            zip1 = request.files['zip1']
+            zip2 = request.files['zip2']
 
-        if zip1.filename == '' or zip2.filename == '':
-            return jsonify({"error": "No selected files"}), 400
+            if zip1.filename == '' or zip2.filename == '':
+                return jsonify({"error": "No selected files"}), 400
 
-        if not zip1.filename.endswith('.zip') or not zip2.filename.endswith('.zip'):
-            return jsonify({"error": "Both files must be zip files"}), 400
+            if not zip1.filename.endswith('.zip') or not zip2.filename.endswith('.zip'):
+                return jsonify({"error": "Both files must be zip files"}), 400
 
-        if zip1.content_length > MAX_SIZE_MB * 1024 * 1024 or zip2.content_length > MAX_SIZE_MB * 1024 * 1024:
-            return jsonify({"error": f"One or both ZIP files exceeds {MAX_SIZE_MB}MB limit"}), 400
+            if zip1.content_length > MAX_SIZE_MB * 1024 * 1024 or zip2.content_length > MAX_SIZE_MB * 1024 * 1024:
+                return jsonify({"error": f"One or both ZIP files exceeds {MAX_SIZE_MB}MB limit"}), 400
 
-        password1 = request.form.get('password1', None)
-        password2 = request.form.get('password2', None)
-        exclude_str = request.form.get('excludeList', '')
-        exclude_list = [item.strip() for item in exclude_str.split(',')] if exclude_str else []
+            password1 = request.form.get('password1', None)
+            password2 = request.form.get('password2', None)
+            exclude_str = request.form.get('excludeList', '')
+            exclude_list = [item.strip() for item in exclude_str.split(',')] if exclude_str else []
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            zip1_path = os.path.join(temp_dir, secure_filename(zip1.filename))
-            zip2_path = os.path.join(temp_dir, secure_filename(zip2.filename))
-            
-            zip1.save(zip1_path)
-            zip2.save(zip2_path)
+            with tempfile.TemporaryDirectory() as temp_dir:
+                zip1_path = os.path.join(temp_dir, secure_filename(zip1.filename))
+                zip2_path = os.path.join(temp_dir, secure_filename(zip2.filename))
+                
+                zip1.save(zip1_path)
+                zip2.save(zip2_path)
 
-            result = zip_comparison(zip1_path, zip2_path, password1, password2, exclude_list)
+                result = zip_comparison(zip1_path, zip2_path, password1, password2, exclude_list)
 
-            return jsonify({
-                "zip1_name": zip1.filename,
-                "zip2_name": zip2.filename,
-                "comparison": result,
-                "exclude_list":exclude_list,
-            })
+                return jsonify({
+                    "zip1_name": zip1.filename,
+                    "zip2_name": zip2.filename,
+                    "comparison": result,
+                    "exclude_list":exclude_list,
+                })
 
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
-    except Exception as e:
-        return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
+        except Exception as e:
+            return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
+    else:
+        return jsonify({"error": "Invalid API Key"}), 403
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0",debug=False)
