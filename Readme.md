@@ -136,4 +136,4 @@ The API returns appropriate error messages and status codes for various scenario
 
 ## Connect with Me
 
-Feel free to connect with me on [LinkedIn](https://www.linkedin.com/).
+Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/aslam8483).
